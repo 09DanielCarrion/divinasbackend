@@ -23,6 +23,11 @@ public class GlobalExceptionHandler {
         return construir(HttpStatus.NOT_FOUND, "NO_ENCONTRADO", ex.getMessage(), Map.of());
     }
 
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<ErrorResponse> credencialesInvalidas(CredencialesInvalidasException ex) {
+        return construir(HttpStatus.UNAUTHORIZED, "CREDENCIALES_INVALIDAS", ex.getMessage(), Map.of());
+    }
+
     @ExceptionHandler(ConflictoException.class)
     public ResponseEntity<ErrorResponse> conflicto(ConflictoException ex) {
         return construir(HttpStatus.CONFLICT, "CONFLICTO", ex.getMessage(), Map.of());
