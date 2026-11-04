@@ -11,4 +11,5 @@ public interface ClienteService {
     public void update(Cliente cliente);
     public List<Cliente> listByTienda(int idTienda);
     public void deactivate(int id);
+    public long countActivos(int idTienda);
 }

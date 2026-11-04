@@ -12,4 +12,6 @@ public interface ProductoServicioRepository extends JpaRepository<ProductoServic
     List<ProductoServicio> findByTienda_IdTienda(Integer idTienda);
 
     List<ProductoServicio> findByTienda_IdTiendaAndEstadoTrue(Integer idTienda);
+
+    long countByTienda_IdTiendaAndEstadoTrue(Integer idTienda);
 }

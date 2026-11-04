@@ -3,6 +3,7 @@ package com.upc.divinasbackend.controllers;
 import com.upc.divinasbackend.dtos.CompraRequestDTO;
 import com.upc.divinasbackend.dtos.CompraResponseDTO;
 import com.upc.divinasbackend.dtos.CuotaDetalleDTO;
+import com.upc.divinasbackend.dtos.PagoRequestDTO;
 import com.upc.divinasbackend.dtos.SimulacionRequestDTO;
 import com.upc.divinasbackend.dtos.SimulacionResponseDTO;
 import com.upc.divinasbackend.entities.Cliente;
@@ -14,6 +15,7 @@ import com.upc.divinasbackend.finanzas.FilaCuota;
 import com.upc.divinasbackend.finanzas.PlanDePagos;
 import com.upc.divinasbackend.serviceinterfaces.ClienteService;
 import com.upc.divinasbackend.serviceinterfaces.CompraService;
+import com.upc.divinasbackend.serviceinterfaces.CuotaService;
 import com.upc.divinasbackend.serviceinterfaces.ProductoServicioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,9 @@ public class CompraController {
 
     @Autowired
     private ProductoServicioService pS;
+
+    @Autowired
+    private CuotaService cuS;
 
     // Calcula el plan de pagos sin guardar nada en la base
     @PostMapping("/simular")
@@ -82,6 +87,22 @@ public class CompraController {
         if (compra == null || !compra.getCliente().getIdCliente().equals(idCliente)) {
             throw new RecursoNoEncontradoException("La compra no existe para este cliente.");
         }
+        return aRespuesta(compra, cliente);
+    }
+
+    @PutMapping("/{idCompra}/cuotas/{numeroCuota}/pagar")
+    public CompraResponseDTO pagarCuota(@PathVariable("idTienda") int idTienda,
+                                        @PathVariable("idCliente") int idCliente,
+                                        @PathVariable("idCompra") int idCompra,
+                                        @PathVariable("numeroCuota") int numeroCuota,
+                                        @RequestBody(required = false) PagoRequestDTO dto) {
+        Cliente cliente = buscarClienteDeTienda(idTienda, idCliente);
+        Compra compra = coS.listId(idCompra);
+        if (compra == null || !compra.getCliente().getIdCliente().equals(idCliente)) {
+            throw new RecursoNoEncontradoException("La compra no existe para este cliente.");
+        }
+        LocalDate fechaPago = dto != null && dto.fechaPago() != null ? dto.fechaPago() : LocalDate.now();
+        cuS.pagar(idCompra, numeroCuota, fechaPago);
         return aRespuesta(compra, cliente);
     }
 

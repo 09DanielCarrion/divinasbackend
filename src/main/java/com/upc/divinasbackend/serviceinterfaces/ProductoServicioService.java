@@ -11,4 +11,5 @@ public interface ProductoServicioService {
     public void update(ProductoServicio productoServicio);
     public List<ProductoServicio> listByTienda(int idTienda, boolean soloActivos);
     public void deactivate(int id);
+    public long countActivos(int idTienda);
 }

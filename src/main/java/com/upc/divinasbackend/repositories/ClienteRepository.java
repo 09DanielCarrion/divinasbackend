@@ -11,6 +11,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
     List<Cliente> findByTienda_IdTienda(Integer idTienda);
 
+    long countByTienda_IdTiendaAndEstadoTrue(Integer idTienda);
+
     boolean existsByTienda_IdTiendaAndUsuarioCliente(Integer idTienda, String usuarioCliente);
 
     // Para validar al modificar: otro cliente distinto de la misma tienda no puede usar ese usuario

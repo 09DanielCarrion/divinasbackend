@@ -83,4 +83,9 @@ public class ClienteServiceImplement implements ClienteService {
             cliente.setCapitalizacion(null);
         }
     }
+
+    @Override
+    public long countActivos(int idTienda) {
+        return cR.countByTienda_IdTiendaAndEstadoTrue(idTienda);
+    }
 }

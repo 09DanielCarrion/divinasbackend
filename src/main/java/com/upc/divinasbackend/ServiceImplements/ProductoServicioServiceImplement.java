@@ -61,4 +61,9 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
         producto.setEstado(false);
         psR.save(producto);
     }
+
+    @Override
+    public long countActivos(int idTienda) {
+        return psR.countByTienda_IdTiendaAndEstadoTrue(idTienda);
+    }
 }
