@@ -73,7 +73,6 @@ public class ProductoServicioController {
         producto.setDescripcion(dto.descripcion());
         producto.setUnidadMedida(dto.unidadMedida());
         producto.setPrecioContado(dto.precioContado());
-        producto.setPrecioCredito(dto.precioCredito());
         if (dto.formaVenta() != null) {
             producto.setFormaVenta(dto.formaVenta());
         }
@@ -98,6 +97,6 @@ public class ProductoServicioController {
     private ProductoServicioResponseDTO aRespuesta(ProductoServicio p) {
         return new ProductoServicioResponseDTO(p.getIdProductoServicio(), p.getTienda().getIdTienda(),
                 p.getImagen(), p.getProveedor(), p.getMarca(), p.getDescripcion(), p.getUnidadMedida(),
-                p.getPrecioContado(), p.getPrecioCredito(), p.getFormaVenta(), p.getEstado());
+                p.getPrecioContado(), p.getFormaVenta(), p.getEstado());
     }
 }

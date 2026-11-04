@@ -5,6 +5,7 @@ import com.upc.divinasbackend.dtos.ClienteResponseDTO;
 import com.upc.divinasbackend.dtos.ClienteUpdateDTO;
 import com.upc.divinasbackend.entities.Cliente;
 import com.upc.divinasbackend.entities.Tienda;
+import com.upc.divinasbackend.exceptions.ConflictoException;
 import com.upc.divinasbackend.exceptions.RecursoNoEncontradoException;
 import com.upc.divinasbackend.serviceinterfaces.ClienteService;
 import com.upc.divinasbackend.serviceinterfaces.TiendaService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/tiendas/{idTienda}/clientes")
@@ -63,17 +65,13 @@ public class ClienteController {
                                          @PathVariable("idCliente") int idCliente,
                                          @Valid @RequestBody ClienteUpdateDTO dto) {
         Cliente cliente = buscarClienteDeTienda(idTienda, idCliente);
+        validarCondicionesFinancierasSinCambio(cliente, dto);
         cliente.setNombreCliente(dto.nombreCliente());
-        cliente.setTipoTasa(dto.tipoTasa());
-        cliente.setTasaInteres(dto.tasaInteres());
-        cliente.setCapitalizacion(dto.capitalizacion());
         if (dto.moneda() != null) {
             cliente.setMoneda(dto.moneda());
         }
         cliente.setLimiteMaxCredito(dto.limiteMaxCredito());
         cliente.setMaxMesesCredito(dto.maxMesesCredito());
-        cliente.setFechaCorte(dto.fechaCorte());
-        cliente.setFechaPago(dto.fechaPago());
         cliente.setUsuarioCliente(dto.usuarioCliente());
         cS.update(cliente);
         return aRespuesta(cliente);
@@ -85,6 +83,19 @@ public class ClienteController {
         buscarClienteDeTienda(idTienda, idCliente);
         cS.deactivate(idCliente);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validarCondicionesFinancierasSinCambio(Cliente cliente, ClienteUpdateDTO dto) {
+        String capitalizacionNueva = "Efectiva".equals(dto.tipoTasa()) ? null : dto.capitalizacion();
+        boolean cambia = !Objects.equals(cliente.getTipoTasa(), dto.tipoTasa())
+                || cliente.getTasaInteres().compareTo(dto.tasaInteres()) != 0
+                || !Objects.equals(cliente.getCapitalizacion(), capitalizacionNueva)
+                || !Objects.equals(cliente.getFechaCorte(), dto.fechaCorte())
+                || !Objects.equals(cliente.getFechaPago(), dto.fechaPago());
+        if (cambia) {
+            throw new ConflictoException(
+                    "La tasa, la capitalización y las fechas de corte y pago no se pueden modificar.");
+        }
     }
 
     private Tienda buscarTienda(int idTienda) {

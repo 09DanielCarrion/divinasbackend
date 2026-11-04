@@ -21,7 +21,6 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
         if (!Boolean.TRUE.equals(producto.getTienda().getEstado())) {
             throw new SolicitudInvalidaException("La tienda está dada de baja.");
         }
-        validarPrecios(producto);
         if (producto.getFormaVenta() == null || producto.getFormaVenta().isBlank()) {
             producto.setFormaVenta("En meses");
         }
@@ -43,7 +42,6 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
 
     @Override
     public void update(ProductoServicio producto) {
-        validarPrecios(producto);
         psR.save(producto);
     }
 
@@ -62,12 +60,5 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
                 .orElseThrow(() -> new RecursoNoEncontradoException("El producto o servicio no existe."));
         producto.setEstado(false);
         psR.save(producto);
-    }
-
-    // Regla del TP: el precio a crédito debe ser mayor que el precio al contado
-    private void validarPrecios(ProductoServicio producto) {
-        if (producto.getPrecioCredito().compareTo(producto.getPrecioContado()) <= 0) {
-            throw new SolicitudInvalidaException("El precio a crédito debe ser mayor que el precio al contado.");
-        }
     }
 }

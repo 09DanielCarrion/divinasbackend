@@ -11,7 +11,6 @@ public record ProductoServicioResponseDTO(
         String descripcion,
         String unidadMedida,
         BigDecimal precioContado,
-        BigDecimal precioCredito,
         String formaVenta,
         Boolean estado
 ) {

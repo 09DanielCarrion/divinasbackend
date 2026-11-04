@@ -32,11 +32,6 @@ public record ProductoServicioRequestDTO(
         @Digits(integer = 10, fraction = 2, message = "El precio admite hasta 2 decimales.")
         BigDecimal precioContado,
 
-        @NotNull(message = "El precio a crédito es obligatorio.")
-        @DecimalMin(value = "0", inclusive = false, message = "El precio a crédito debe ser mayor a 0.")
-        @Digits(integer = 10, fraction = 2, message = "El precio admite hasta 2 decimales.")
-        BigDecimal precioCredito,
-
         @Pattern(regexp = "^(Al contado|En meses)$", message = "La forma de venta debe ser 'Al contado' o 'En meses'.")
         String formaVenta
 ) {
