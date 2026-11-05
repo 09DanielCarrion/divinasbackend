@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    public static final String ROL_SISTEMA = "ADMIN_SISTEMA";
     public static final String ROL_ADMIN = "ADMIN_TIENDA";
     public static final String ROL_CLIENTE = "CLIENTE";
 
@@ -63,8 +64,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/tiendas").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/tiendas").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/tiendas").access(AutorizacionRutas.soloSistema())
+                        .requestMatchers(HttpMethod.GET, "/api/tiendas").access(AutorizacionRutas.soloSistema())
+                        .requestMatchers(HttpMethod.DELETE, "/api/tiendas/{idTienda}").access(AutorizacionRutas.soloSistema())
+                        .requestMatchers(HttpMethod.PUT, "/api/tiendas/{idTienda}").access(AutorizacionRutas.sistemaOAdmin())
+                        .requestMatchers(HttpMethod.GET, "/api/operaciones").access(AutorizacionRutas.soloSistema())
 
                         .requestMatchers("/api/tiendas/{idTienda}/clientes/{idCliente}/**")
                         .access(AutorizacionRutas.adminOClientePropio())
@@ -72,7 +78,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/tiendas/{idTienda}/productos/**")
                         .access(AutorizacionRutas.adminOLecturaDeTienda())
                         .requestMatchers(HttpMethod.GET, "/api/tiendas/{idTienda}")
-                        .access(AutorizacionRutas.adminOLecturaDeTienda())
+                        .access(AutorizacionRutas.datosDeTienda())
 
                         .requestMatchers("/api/tiendas/{idTienda}/**")
                         .access(AutorizacionRutas.soloAdmin())
@@ -91,6 +97,19 @@ public class SecurityConfig {
     static final class AutorizacionRutas {
 
         private AutorizacionRutas() {
+        }
+
+        static AuthorizationManager<RequestAuthorizationContext> soloSistema() {
+            return (auth, ctx) -> new AuthorizationDecision(esSistema(auth));
+        }
+
+        static AuthorizationManager<RequestAuthorizationContext> sistemaOAdmin() {
+            return (auth, ctx) -> new AuthorizationDecision(esSistema(auth) || esAdminDeLaTienda(auth, ctx));
+        }
+
+        static AuthorizationManager<RequestAuthorizationContext> datosDeTienda() {
+            return (auth, ctx) -> new AuthorizationDecision(esSistema(auth) || esAdminDeLaTienda(auth, ctx)
+                    || (esLectura(ctx) && esClienteDeLaTienda(auth, ctx)));
         }
 
         static AuthorizationManager<RequestAuthorizationContext> soloAdmin() {
@@ -124,6 +143,11 @@ public class SecurityConfig {
 
         private static boolean esLectura(RequestAuthorizationContext ctx) {
             return "GET".equals(ctx.getRequest().getMethod());
+        }
+
+        private static boolean esSistema(Supplier<? extends Authentication> auth) {
+            Jwt token = token(auth);
+            return token != null && ROL_SISTEMA.equals(token.getClaimAsString("rol"));
         }
 
         private static boolean esAdminDeLaTienda(Supplier<? extends Authentication> auth, RequestAuthorizationContext ctx) {

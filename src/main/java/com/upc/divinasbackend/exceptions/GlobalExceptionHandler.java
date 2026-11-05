@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors()
                 .forEach(e -> detalles.putIfAbsent(e.getField(), e.getDefaultMessage()));
         return construir(HttpStatus.BAD_REQUEST, "VALIDACION", "Hay campos inválidos.", detalles);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> parametroInvalido(MethodArgumentTypeMismatchException ex) {
+        return construir(HttpStatus.BAD_REQUEST, "SOLICITUD_INVALIDA",
+                "El parámetro '" + ex.getName() + "' tiene un valor inválido.", Map.of());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,8 @@ public interface CuotaRepository extends JpaRepository<Cuota, Integer> {
     @Query("select count(distinct c.compra.idCompra) from Cuota c "
             + "where c.compra.cliente.tienda.idTienda = :idTienda and c.estado = 'Pendiente'")
     long contarComprasEnCurso(@Param("idTienda") Integer idTienda);
+
+    @Query("select coalesce(sum(c.montoCuota), 0) from Cuota c "
+            + "where c.compra.cliente.idCliente = :idCliente and c.estado = 'Pendiente'")
+    BigDecimal saldoPendienteDelCliente(@Param("idCliente") Integer idCliente);
 }

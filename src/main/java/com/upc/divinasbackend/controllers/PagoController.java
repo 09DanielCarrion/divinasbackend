@@ -51,7 +51,9 @@ public class PagoController {
                 enCurso++;
             }
         }
-        return new PagosClienteDTO(idCliente, cliente.getNombreCliente(), saldoTotal, enCurso, compras);
+        BigDecimal disponible = cliente.getLimiteMaxCredito().subtract(saldoTotal).max(BigDecimal.ZERO);
+        return new PagosClienteDTO(idCliente, cliente.getNombreCliente(), cliente.getLimiteMaxCredito(), disponible,
+                saldoTotal, enCurso, compras);
     }
 
     private PagoCompraDTO aPago(List<Cuota> cuotas) {

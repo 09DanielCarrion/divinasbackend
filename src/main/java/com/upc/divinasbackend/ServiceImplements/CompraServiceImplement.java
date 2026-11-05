@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +56,11 @@ public class CompraServiceImplement implements CompraService {
         if (!Boolean.TRUE.equals(cliente.getEstado())) {
             throw new SolicitudInvalidaException("El cliente está dado de baja.");
         }
-        if (monto.compareTo(cliente.getLimiteMaxCredito()) > 0) {
-            throw new SolicitudInvalidaException("El monto supera el límite de crédito del cliente.");
+        BigDecimal deuda = cuR.saldoPendienteDelCliente(cliente.getIdCliente());
+        BigDecimal disponible = cliente.getLimiteMaxCredito().subtract(deuda);
+        if (monto.compareTo(disponible) > 0) {
+            throw new SolicitudInvalidaException("El monto supera el crédito disponible del cliente: S/ "
+                    + disponible.max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP) + ".");
         }
         if ("En meses".equals(formaPago)) {
             if (numMeses == null) {
@@ -78,11 +82,11 @@ public class CompraServiceImplement implements CompraService {
         if (!Boolean.TRUE.equals(producto.getEstado())) {
             throw new SolicitudInvalidaException("El producto o servicio está dado de baja.");
         }
-        if (!"En meses".equals(producto.getFormaVenta())) {
-            throw new SolicitudInvalidaException("Este producto o servicio solo se vende al contado.");
+        if ("Al contado".equals(producto.getFormaVenta()) && "En meses".equals(formaPago)) {
+            throw new SolicitudInvalidaException("Este producto o servicio solo se vende en un solo pago.");
         }
-        // El monto financiado es el precio al contado; el precio a crédito (lo que termina pagando) es resultado del plan
-        BigDecimal monto = producto.getPrecioContado();
+        // El monto financiado es el precio de lista (crédito) del producto
+        BigDecimal monto = producto.getPrecioCredito();
         PlanDePagos plan = simular(cliente, fechaCompra, monto, formaPago, numMeses);
 
         Compra compra = new Compra();

@@ -19,7 +19,7 @@ public interface CompraService {
     // Calcula el plan de pagos de una compra sin guardar nada
     public PlanDePagos simular(Cliente cliente, LocalDate fechaCompra, BigDecimal monto, String formaPago, Integer numMeses);
 
-    // Registra la compra (monto = precio al contado del producto) y guarda sus cuotas
+    // Registra la compra (monto = precio de lista (crédito) del producto) y guarda sus cuotas
     public Compra registrar(Cliente cliente, ProductoServicio producto, LocalDate fechaCompra, String formaPago, Integer numMeses);
 
     public List<Compra> listByCliente(int idCliente);

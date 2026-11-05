@@ -1,6 +1,7 @@
 package com.upc.divinasbackend.controllers;
 
 import com.upc.divinasbackend.entities.Tienda;
+import com.upc.divinasbackend.serviceinterfaces.OperacionService;
 import com.upc.divinasbackend.serviceinterfaces.TiendaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ class TiendaControllerTest {
 
     @MockitoBean
     private TiendaService tiendaService;
+
+    @MockitoBean
+    private OperacionService operacionService;
 
     @Test
     void crearConTelefonoInvalidoDevuelve400ConDetalle() throws Exception {

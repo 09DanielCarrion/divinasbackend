@@ -21,6 +21,7 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
         if (!Boolean.TRUE.equals(producto.getTienda().getEstado())) {
             throw new SolicitudInvalidaException("La tienda está dada de baja.");
         }
+        validarPrecios(producto);
         if (producto.getFormaVenta() == null || producto.getFormaVenta().isBlank()) {
             producto.setFormaVenta("En meses");
         }
@@ -42,6 +43,7 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
 
     @Override
     public void update(ProductoServicio producto) {
+        validarPrecios(producto);
         psR.save(producto);
     }
 
@@ -65,5 +67,12 @@ public class ProductoServicioServiceImplement implements ProductoServicioService
     @Override
     public long countActivos(int idTienda) {
         return psR.countByTienda_IdTiendaAndEstadoTrue(idTienda);
+    }
+
+    // Regla del enunciado: el precio de lista (crédito) debe ser mayor que el precio al contado
+    private void validarPrecios(ProductoServicio producto) {
+        if (producto.getPrecioCredito().compareTo(producto.getPrecioContado()) <= 0) {
+            throw new SolicitudInvalidaException("El precio de lista (crédito) debe ser mayor que el precio al contado.");
+        }
     }
 }

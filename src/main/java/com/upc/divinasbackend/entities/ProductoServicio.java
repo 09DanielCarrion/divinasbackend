@@ -35,6 +35,9 @@ public class ProductoServicio {
     @Column(name = "precio_contado", nullable = false, precision = 12, scale = 2)
     private BigDecimal precioContado;
 
+    @Column(name = "precio_credito", nullable = false, precision = 12, scale = 2)
+    private BigDecimal precioCredito;
+
     // "Al contado" o "En meses"
     @Column(name = "forma_venta", nullable = false, length = 15)
     private String formaVenta = "En meses";
@@ -47,7 +50,7 @@ public class ProductoServicio {
 
     public ProductoServicio(Integer idProductoServicio, Tienda tienda, String imagen, String proveedor,
                             String marca, String descripcion, String unidadMedida,
-                            BigDecimal precioContado, String formaVenta,
+                            BigDecimal precioContado, BigDecimal precioCredito, String formaVenta,
                             Boolean estado) {
         this.idProductoServicio = idProductoServicio;
         this.tienda = tienda;
@@ -57,6 +60,7 @@ public class ProductoServicio {
         this.descripcion = descripcion;
         this.unidadMedida = unidadMedida;
         this.precioContado = precioContado;
+        this.precioCredito = precioCredito;
         this.formaVenta = formaVenta;
         this.estado = estado;
     }
@@ -84,6 +88,9 @@ public class ProductoServicio {
 
     public BigDecimal getPrecioContado() { return precioContado; }
     public void setPrecioContado(BigDecimal precioContado) { this.precioContado = precioContado; }
+
+    public BigDecimal getPrecioCredito() { return precioCredito; }
+    public void setPrecioCredito(BigDecimal precioCredito) { this.precioCredito = precioCredito; }
 
 
     public String getFormaVenta() { return formaVenta; }

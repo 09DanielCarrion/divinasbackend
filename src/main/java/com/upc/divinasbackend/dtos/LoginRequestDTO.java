@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern;
 
 public record LoginRequestDTO(
         @NotBlank(message = "El tipo de usuario es obligatorio.")
-        @Pattern(regexp = "^(ADMIN|CLIENTE)$", message = "El tipo debe ser ADMIN o CLIENTE.")
+        @Pattern(regexp = "^(SISTEMA|ADMIN|CLIENTE)$", message = "El tipo debe ser SISTEMA, ADMIN o CLIENTE.")
         String tipo,
 
 
